@@ -3,9 +3,12 @@ package com.econetwireless.epay.api.rest.resources;
 import com.econetwireless.epay.api.processors.api.EpayRequestProcessor;
 import com.econetwireless.epay.api.processors.api.ReportingProcessor;
 import com.econetwireless.epay.api.rest.messages.TransactionsResponse;
+import com.econetwireless.epay.business.services.impl.CreditsServiceImpl;
 import com.econetwireless.utils.messages.AirtimeBalanceResponse;
 import com.econetwireless.utils.messages.AirtimeTopupRequest;
 import com.econetwireless.utils.messages.AirtimeTopupResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -21,10 +24,11 @@ public class EpayResource {
 
 
     private ReportingProcessor reportingProcessor;
+    private static final Logger LOGGER = LoggerFactory.getLogger(CreditsServiceImpl.class);
 
     @GetMapping(value = "enquiries/{partnerCode}/balances/{mobileNumber}",
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public AirtimeBalanceResponse enquireAirtimeBalance( final String pCode, @PathVariable("mobileNumber") final String msisdn) {
+    public AirtimeBalanceResponse enquireAirtimeBalance(@PathVariable("partnerCode")  final String pCode, @PathVariable("mobileNumber") final String msisdn) {
         return epayRequestProcessor.enquireAirtimeBalance(pCode, msisdn);
     }
 
@@ -38,6 +42,9 @@ public class EpayResource {
     @GetMapping(value = "transactions/{partnerCode}",
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public TransactionsResponse getPartnerTransactions(@PathVariable("partnerCode") final String partnerCode) {
+        LOGGER.info("<<<<<<<<<<<<<<<<Parsed partnerCOde>>>>>>>>>>>>>>> {}", partnerCode);
         return reportingProcessor.getPartnerTransactions(partnerCode);
     }
+
+
 }
