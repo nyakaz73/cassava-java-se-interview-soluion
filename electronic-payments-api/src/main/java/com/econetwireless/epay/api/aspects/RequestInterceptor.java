@@ -2,6 +2,8 @@ package com.econetwireless.epay.api.aspects;
 
 import com.econetwireless.epay.api.rest.messages.TransactionsResponse;
 import com.econetwireless.epay.business.services.api.PartnerCodeValidator;
+import com.econetwireless.epay.business.services.api.ReportingService;
+import com.econetwireless.epay.domain.SubscriberRequest;
 import com.econetwireless.utils.enums.ResponseCode;
 import com.econetwireless.utils.execeptions.EpayException;
 import com.econetwireless.utils.formatters.ResponseMarker;
@@ -18,6 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * Created by tnyamakura on 18/3/2017.
  */
@@ -30,13 +34,18 @@ public class RequestInterceptor {
     @Autowired
     private PartnerCodeValidator partnerCodeValidator;
 
-    @Around("execution(* com.econetwireless.epay.api.rest.resources.EpayResource.getPartnerTransactions(..)) and args(partnerCode)")
+    @Autowired private ReportingService reportingService;
+
+    @Around("execution(* com.econetwireless.epay.api.rest.resources.EpayResource.getPartnerTransactions(..)) && args(partnerCode)")
     public TransactionsResponse getPartnerTransactions(final ProceedingJoinPoint joinPoint, final String partnerCode) {
         TransactionsResponse transactionsResponse = new TransactionsResponse();
         try {
             LOGGER.info("IN Get Partner Transactions :: Partner Code : {}",
                     partnerCode);
             transactionsResponse = checkingMissingFields(partnerCode);
+
+            final List<SubscriberRequest> subscriberRequests = reportingService.findSubscriberRequestsByPartnerCode(partnerCode);
+            transactionsResponse.setSubscriberRequests(subscriberRequests);
             if(StringUtils.isNotEmpty(transactionsResponse.getResponseCode())) {
                 return transactionsResponse;
             }
@@ -60,7 +69,7 @@ public class RequestInterceptor {
     }
 
 
-    @Around("execution(* com.econetwireless.epay.api.rest.resources.EpayResource.enquireAirtimeBalance(..)) and args(partnerCode, msisdn)")
+    @Around("execution(* com.econetwireless.epay.api.rest.resources.EpayResource.enquireAirtimeBalance(..)) && args(partnerCode, msisdn)")
     public AirtimeBalanceResponse enquireAirtimeBalance(final ProceedingJoinPoint joinPoint, final String partnerCode, final String msisdn) {
         AirtimeBalanceResponse airtimeBalanceResponse = new AirtimeBalanceResponse();
         try {
@@ -89,7 +98,7 @@ public class RequestInterceptor {
         return  airtimeBalanceResponse;
     }
 
-    @Around("execution(* com.econetwireless.epay.api.rest.resources.EpayResource.creditAirtime(..)) and args(airtimeTopupRequest)")
+    @Around("execution(* com.econetwireless.epay.api.rest.resources.EpayResource.creditAirtime(..)) && args(airtimeTopupRequest)")
     public AirtimeTopupResponse creditAirtime(final ProceedingJoinPoint joinPoint, final AirtimeTopupRequest airtimeTopupRequest) {
         AirtimeTopupResponse airtimeTopupResponse = new AirtimeTopupResponse();
         try {
@@ -130,6 +139,10 @@ public class RequestInterceptor {
             airtimeTopupResponse.setNarrative(builder.toString());
             airtimeTopupResponse.setResponseCode(ResponseCode.INVALID_REQUEST.getCode());
         }
+        airtimeTopupResponse.setResponseCode(ResponseCode.SUCCESS.getCode());
+
+        airtimeTopupResponse.setBalance(5.0); //Value greater than the airtime topup request
+
         return  airtimeTopupResponse;
 
     }
@@ -143,11 +156,15 @@ public class RequestInterceptor {
             airtimeBalanceResponse.setNarrative(builder.toString());
             airtimeBalanceResponse.setResponseCode(ResponseCode.INVALID_REQUEST.getCode());
         }
+        airtimeBalanceResponse.setResponseCode(ResponseCode.SUCCESS.getCode());
+
+        airtimeBalanceResponse.setAmount(5.0);/////////////////////come here later
         return  airtimeBalanceResponse;
 
     }
 
     private static TransactionsResponse checkingMissingFields(final String partnerCode) {
+        LOGGER.info(">>>>>>>>>>>>>>>CHECK PARTER CODE {}", partnerCode);
         final TransactionsResponse transactionsResponse = new TransactionsResponse();
         transactionsResponse.setPartnerCode(partnerCode);
         final StringBuilder builder = new StringBuilder();
@@ -156,6 +173,10 @@ public class RequestInterceptor {
             transactionsResponse.setNarrative(builder.toString());
             transactionsResponse.setResponseCode(ResponseCode.INVALID_REQUEST.getCode());
         }
+        LOGGER.info(">>>Response code, {}", ResponseCode.SUCCESS.getCode());
+        transactionsResponse.setResponseCode(ResponseCode.SUCCESS.getCode());
+        LOGGER.info(">>>>>>>>.after parter code check, {}", transactionsResponse.getPartnerCode());
+        LOGGER.info(">>>>>>>>>>>>>>>>Getting response code {}", transactionsResponse.getResponseCode());
         return  transactionsResponse;
 
     }
