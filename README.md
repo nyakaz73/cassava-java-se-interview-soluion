@@ -4,7 +4,10 @@
 
 
 ## Getting Started
-To get started run the mvn clean test to verify all test suits as follows:
+To get started run mvn clean and the mvn clean test to verify all test suits as follows:
+```cmd
+mvn clean
+```
 ```cmd
 mvn clean test
 ```
