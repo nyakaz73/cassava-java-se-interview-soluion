@@ -63,3 +63,11 @@ To run the emebeded jetty web server run the following command
 mvn jetty:run
 ```
 You should the apple to see the webserver being served at  localhost PORT **8080**
+
+### To run the coverage test
+To run the test coverage for the business module you should run the following cmd 
+
+```cmd
+mvn clean verify
+```
+and jacoco/index.html should be a able to fire the report.
