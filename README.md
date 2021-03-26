@@ -29,3 +29,8 @@ mvn clean test
 1. By creating /data and gave it 777 permission on my development system.
 
 
+### BUSINESS MODULE UNIT TESTING
+In order to run some unit testing in this package i had to implement and configure a few things as follows
+* Created PartnerResponse DTO in econet-utils
+* Created TransactionResponse DTO in electronic-payments-api
+
