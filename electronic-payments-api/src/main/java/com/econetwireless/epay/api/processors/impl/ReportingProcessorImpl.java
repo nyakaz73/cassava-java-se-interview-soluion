@@ -1,7 +1,7 @@
 package com.econetwireless.epay.api.processors.impl;
 
 import com.econetwireless.epay.api.processors.api.ReportingProcessor;
-import com.econetwireless.epay.api.rest.messages.TransactionsResponse;
+import com.econetwireless.epay.api.rest.resources.messages.TransactionsResponse;
 import com.econetwireless.epay.business.services.api.ReportingService;
 import com.econetwireless.epay.business.services.impl.CreditsServiceImpl;
 import com.econetwireless.epay.domain.SubscriberRequest;

@@ -1,6 +1,5 @@
 package com.econetwireless.epay.api.processors.api;
 
-import com.econetwireless.epay.api.rest.messages.TransactionsResponse;
 import com.econetwireless.utils.messages.AirtimeBalanceResponse;
 import com.econetwireless.utils.messages.AirtimeTopupRequest;
 import com.econetwireless.utils.messages.AirtimeTopupResponse;
