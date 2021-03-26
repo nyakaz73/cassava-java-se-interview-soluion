@@ -33,4 +33,33 @@ mvn clean test
 In order to run some unit testing in this package i had to implement and configure a few things as follows
 * Created PartnerResponse DTO in econet-utils
 * Created TransactionResponse DTO in electronic-payments-api
+* Created BusinessApiTest file
+* Created EpayBusinessResource Controller in resources package
 
+#### Web Dependency Injection For the New test file
+* Created aspects with RequestBusinessInterceptor
+* Created EpayBusinessAspectConfig and EpayBusinessWebConfig
+* Created EpayBusinessRequestProcessor and ReportingBusinessProcessor Middleware Services between the Controller and the Services
+
+#### Additional Classes 
+* Created TransactionsResponse DTO
+* Created EpayBusinessResource Controller
+* Added validatePartnerCodeData service method
+* Added sql testfiles in resources
+* Created  BusinessApiTest  test file
+
+
+### Enabling Web Service Connection Pooling for the intelligent-network-api module
+
+* Installed dbcp2 and postgresql dependencies
+*  Configured DB Connection Pooling in IntelligentNetworkPublisher with pool initial size of 2
+ 
+
+
+### Embedded Jetty web Server
+To run the emebeded jetty web server run the following command
+
+```cmd
+mvn jetty:run
+```
+You should the apple to see the webserver being served at  localhost PORT **8080**
