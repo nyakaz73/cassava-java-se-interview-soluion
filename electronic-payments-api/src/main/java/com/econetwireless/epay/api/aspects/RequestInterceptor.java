@@ -1,6 +1,6 @@
 package com.econetwireless.epay.api.aspects;
 
-import com.econetwireless.epay.api.rest.messages.TransactionsResponse;
+import com.econetwireless.epay.api.rest.resources.messages.TransactionsResponse;
 import com.econetwireless.epay.business.services.api.PartnerCodeValidator;
 import com.econetwireless.epay.business.services.api.ReportingService;
 import com.econetwireless.epay.domain.SubscriberRequest;
@@ -36,7 +36,7 @@ public class RequestInterceptor {
 
     @Autowired private ReportingService reportingService;
 
-    @Around("execution(* com.econetwireless.epay.api.rest.resources.EpayResource.getPartnerTransactions(..)) && args(partnerCode)")
+    @Around("execution(* com.econetwireless.epay.api.rest.resources.resources.EpayResource.getPartnerTransactions(..)) && args(partnerCode)")
     public TransactionsResponse getPartnerTransactions(final ProceedingJoinPoint joinPoint, final String partnerCode) {
         TransactionsResponse transactionsResponse = new TransactionsResponse();
         try {
@@ -69,7 +69,7 @@ public class RequestInterceptor {
     }
 
 
-    @Around("execution(* com.econetwireless.epay.api.rest.resources.EpayResource.enquireAirtimeBalance(..)) && args(partnerCode, msisdn)")
+    @Around("execution(* com.econetwireless.epay.api.rest.resources.resources.EpayResource.enquireAirtimeBalance(..)) && args(partnerCode, msisdn)")
     public AirtimeBalanceResponse enquireAirtimeBalance(final ProceedingJoinPoint joinPoint, final String partnerCode, final String msisdn) {
         AirtimeBalanceResponse airtimeBalanceResponse = new AirtimeBalanceResponse();
         try {
@@ -98,7 +98,7 @@ public class RequestInterceptor {
         return  airtimeBalanceResponse;
     }
 
-    @Around("execution(* com.econetwireless.epay.api.rest.resources.EpayResource.creditAirtime(..)) && args(airtimeTopupRequest)")
+    @Around("execution(* com.econetwireless.epay.api.rest.resources.resources.EpayResource.creditAirtime(..)) && args(airtimeTopupRequest)")
     public AirtimeTopupResponse creditAirtime(final ProceedingJoinPoint joinPoint, final AirtimeTopupRequest airtimeTopupRequest) {
         AirtimeTopupResponse airtimeTopupResponse = new AirtimeTopupResponse();
         try {
@@ -138,10 +138,11 @@ public class RequestInterceptor {
         if(builder.length() > 0) {
             airtimeTopupResponse.setNarrative(builder.toString());
             airtimeTopupResponse.setResponseCode(ResponseCode.INVALID_REQUEST.getCode());
+        }else{
+            airtimeTopupResponse.setResponseCode(ResponseCode.SUCCESS.getCode());
+            airtimeTopupResponse.setBalance(airtimeTopupRequest.getAmount()+2.0); //Value greater than the airtime topup request
         }
-        airtimeTopupResponse.setResponseCode(ResponseCode.SUCCESS.getCode());
 
-        airtimeTopupResponse.setBalance(5.0); //Value greater than the airtime topup request
 
         return  airtimeTopupResponse;
 
@@ -155,10 +156,11 @@ public class RequestInterceptor {
         if(builder.length() > 0) {
             airtimeBalanceResponse.setNarrative(builder.toString());
             airtimeBalanceResponse.setResponseCode(ResponseCode.INVALID_REQUEST.getCode());
+        }else{
+            airtimeBalanceResponse.setResponseCode(ResponseCode.SUCCESS.getCode());
+            airtimeBalanceResponse.setAmount(5.0);/////////////////////come here later
         }
-        airtimeBalanceResponse.setResponseCode(ResponseCode.SUCCESS.getCode());
 
-        airtimeBalanceResponse.setAmount(5.0);/////////////////////come here later
         return  airtimeBalanceResponse;
 
     }
@@ -172,11 +174,13 @@ public class RequestInterceptor {
         if(builder.length() > 0) {
             transactionsResponse.setNarrative(builder.toString());
             transactionsResponse.setResponseCode(ResponseCode.INVALID_REQUEST.getCode());
+        }else{
+            LOGGER.info(">>>Response code, {}", ResponseCode.SUCCESS.getCode());
+            transactionsResponse.setResponseCode(ResponseCode.SUCCESS.getCode());
+            LOGGER.info(">>>>>>>>.after parter code check, {}", transactionsResponse.getPartnerCode());
+            LOGGER.info(">>>>>>>>>>>>>>>>Getting response code {}", transactionsResponse.getResponseCode());
         }
-        LOGGER.info(">>>Response code, {}", ResponseCode.SUCCESS.getCode());
-        transactionsResponse.setResponseCode(ResponseCode.SUCCESS.getCode());
-        LOGGER.info(">>>>>>>>.after parter code check, {}", transactionsResponse.getPartnerCode());
-        LOGGER.info(">>>>>>>>>>>>>>>>Getting response code {}", transactionsResponse.getResponseCode());
+
         return  transactionsResponse;
 
     }
